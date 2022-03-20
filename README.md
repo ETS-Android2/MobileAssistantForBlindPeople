@@ -1,3 +1,61 @@
+# MobileAssistantForBlindPeople
+The project aims to provide information and guide the visually impaired people about their environment by using image processing and deep learning techniques through a mobile application.
+
+
+TODOs
+
+* Main screen (Object detection, Text to speech, Mobile Guidance, Introduce a new object)
+
+* Transfer Learning for Object Detection - Running the app with the custom model
+
+* Guidance using Object localization and sensor informations 
+
+* Getting the specific object images and writing them to Firebase Firestore
+
+* Getting the specific object name from user, getting images of the object from GoogleImages, writing them to Firebase Firestore
+* **** Note: An API could be written for that. API could be hosted on Firebase.
+
+* Passing the new model to the application using Firebase ML
+
+* Voice command 
+
+* Voice feedback
+
+
+Tensorflow lite object detection sample app
+
+https://github.com/tensorflow/examples/tree/master/lite/examples/object_detection/android
+
+Environment
+
+* Android Studio 3.2.1
+
+* Gradle version 4.10.1
+
+* Android Plugin version 3.3.1
+
+
+
+Useful Blog
+
+https://blog.tensorflow.org/2018/03/using-tensorflow-lite-on-android.html
+
+
+Introduction Videos
+
+https://www.youtube.com/watch?v=gHN0jDbJz8E  X
+
+https://www.youtube.com/watch?v=JnhW5tQ_7Vo  +
+
+
+
+Transfer Learning for Object Detection
+
+https://www.tensorflow.org/lite/tutorials/model_maker_object_detection
+
+
+
+
 # TensorFlow Lite Object Detection Android Demo
 
 ### Overview
