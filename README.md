@@ -2,6 +2,17 @@
 The project aims to provide information and guide the visually impaired people about their environment by using image processing and deep learning techniques through a mobile application.
 
 
+
+Android Studio Arctic Fox / 2020.3.1
+
+
+File -> Project Structure
+   Android Gradle Plugin Version 4.0.1
+   Gradle Version 6.1.1
+
+
+
+
 TODOs
 
 * Main screen (Object detection, Text to speech, Mobile Guidance, Introduce a new object)
