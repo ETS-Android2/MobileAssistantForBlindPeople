@@ -41,6 +41,7 @@ import org.tensorflow.lite.examples.detection.env.Logger;
 import org.tensorflow.lite.examples.detection.tflite.Detector;
 import org.tensorflow.lite.examples.detection.tflite.TFLiteObjectDetectionAPIModel;
 import org.tensorflow.lite.examples.detection.tracking.MultiBoxTracker;
+import org.tensorflow.lite.examples.detection.utils.TextToSpeechUtil;
 
 /**
  * An activity that uses a TensorFlowMultiBoxDetector and ObjectTracker to detect and then track
@@ -81,6 +82,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private MultiBoxTracker tracker;
 
   private BorderedText borderedText;
+  private TextToSpeechUtil textToSpeechUtil;
 
   @Override
   public void onPreviewSizeChosen(final Size size, final int rotation) {
@@ -91,6 +93,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     borderedText.setTypeface(Typeface.MONOSPACE);
 
     tracker = new MultiBoxTracker(this);
+    textToSpeechUtil = new TextToSpeechUtil(getApplicationContext());
+    textToSpeechUtil.setupTextToSpeech();
 
     int cropSize = TF_OD_API_INPUT_SIZE;
 
@@ -179,6 +183,14 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
             LOGGER.i("Running detection on image " + currTimestamp);
             final long startTime = SystemClock.uptimeMillis();
             final List<Detector.Recognition> results = detector.recognizeImage(croppedBitmap);
+
+            // TODO: Seslendirmeye detay eklenecek. Tam olarak nerede tespit etti?
+            // TODO: Sadece ekrandaki yeri mi verilebiliyor? Location'a dair bir şey var mı bakılacak?
+            // TODO: Türkçe okuyor, tanıdıklarının isimleri ingilizce. Onlar türkçe'ye çevrilebilir.
+
+            if(!textToSpeechUtil.isSpeaking())
+              textToSpeechUtil.startTextToSpeech(results.get(0).getTitle());
+
             lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
 
             cropCopyBitmap = Bitmap.createBitmap(croppedBitmap);

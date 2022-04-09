@@ -59,6 +59,23 @@ dependencies {
     implementation 'androidx.coordinatorlayout:coordinatorlayout:1.0.0'
     implementation 'com.google.android.material:material:1.0.0'
 
+    // https://firebase.google.com/docs/ml/android/use-custom-models
+    // Import the BoM for the Firebase platform
+    implementation platform('com.google.firebase:firebase-bom:29.3.0')
+
+    // Declare the dependency for the Firebase ML model downloader library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-ml-modeldownloader'
+
+    // Also declare the dependency for the TensorFlow Lite library and specify its version
+    implementation 'org.tensorflow:tensorflow-lite:2.7.0'
+
+
+    //Recognize text
+    implementation 'com.google.firebase:firebase-functions:20.0.2'
+    implementation 'com.google.code.gson:gson:2.8.6'
+
+
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'com.google.truth:truth:1.0.1'
     androidTestImplementation 'androidx.test:runner:1.2.0'
@@ -86,3 +103,5 @@ configurations.all {
         }
     }
 }
+
+apply plugin: 'com.google.gms.google-services'
