@@ -9,6 +9,13 @@
     android:padding="@dimen/dp_20"
     tools:context=".assistant_for_the_blind_activities.MainActivity">
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="match_parent"
+        android:id="@+id/login_with_google_button"
+        android:text="Google ile Kayıt ol"
+        android:layout_marginBottom="@dimen/dp_10"
+        android:layout_height="wrap_content"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

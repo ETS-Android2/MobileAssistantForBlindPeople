@@ -3,34 +3,31 @@ package org.tensorflow.lite.examples.detection.assistant_for_the_blind_activitie
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.provider.MediaStore;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
-import android.speech.tts.TextToSpeech;
-import android.speech.tts.Voice;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -46,19 +43,21 @@ import com.google.gson.JsonPrimitive;
 
 import org.tensorflow.lite.examples.detection.DetectorActivity;
 import org.tensorflow.lite.examples.detection.R;
+import org.tensorflow.lite.examples.detection.utils.GoogleLogin;
 import org.tensorflow.lite.examples.detection.utils.TextToSpeechUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity
-                          implements View.OnClickListener, RecognitionListener {
+                          implements View.OnClickListener, RecognitionListener, GoogleApiClient.OnConnectionFailedListener {
 
     private final String LOG_TAG = "MainActivity";
     public static final int REQUEST_MICROPHONE = 1000;
     private static final int REQUEST_CAMERA= 1001;
+    public static final int SIGN_IN_GOOGLE = 1;
 
+    private AppCompatButton loginWithGoogleButton;
     private LinearLayout mainActivityLayout;
     private CardView introduceEnvCardview;
     private CardView readDocumentCardview;
@@ -72,6 +71,7 @@ public class MainActivity extends AppCompatActivity
 
     FirebaseFunctions mFunctions;
     private TextToSpeechUtil textToSpeechUtil;
+    private GoogleLogin googleLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity
                     REQUEST_MICROPHONE);
         }
 
+        loginWithGoogleButton = findViewById(R.id.login_with_google_button);
         mainActivityLayout = findViewById(R.id.main_activity_layout);
         introduceEnvCardview = findViewById(R.id.introduce_env_cardview);
         readDocumentCardview = findViewById(R.id.read_document_cardview);
@@ -93,6 +94,7 @@ public class MainActivity extends AppCompatActivity
         guideCardview = findViewById(R.id.guide_cardview);
         voiceCommandCardview = findViewById(R.id.voice_command_cardview);
 
+        loginWithGoogleButton.setOnClickListener(this);
         mainActivityLayout.setOnClickListener(this);
         introduceEnvCardview.setOnClickListener(this);
         readDocumentCardview.setOnClickListener(this);
@@ -115,12 +117,17 @@ public class MainActivity extends AppCompatActivity
         textToSpeechUtil = new TextToSpeechUtil(getApplicationContext());
         textToSpeechUtil.setupTextToSpeech();
 
+        googleLogin = new GoogleLogin(MainActivity.this);
+        googleLogin.createGoogleApiClient();
     }
 
 
     @Override
     public void onClick(View v) {
-        if(v.getId() == R.id.introduce_env_cardview){
+        if(v.getId() == R.id.login_with_google_button){
+            googleLogin.onGoogleButtonClicked();
+        }
+        else if(v.getId() == R.id.introduce_env_cardview){
             Intent intent = new Intent(MainActivity.this, DetectorActivity.class);
             startActivity(intent);
         }
@@ -151,7 +158,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    // region Google Login
 
+
+
+    // endregion
 
     // region Speech To Text
 
@@ -266,79 +277,88 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(data == null){
-            Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
-            return;
+
+        if (requestCode == SIGN_IN_GOOGLE) {
+
+            googleLogin.onReturnFromGoogleScreen(data);
+
         }
+        else if(requestCode == REQUEST_CAMERA){
 
-        Toast.makeText(MainActivity.this, "Loading", Toast.LENGTH_SHORT).show();
-        Bundle bundle = data.getExtras();
-        if(bundle == null){
-            Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Bitmap bitmap = (Bitmap) bundle.get("data");
+            if(data == null){
+                Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-        // Source: https://firebase.google.com/docs/ml/android/recognize-text?utm_source=studio#before-you-begin
+            Toast.makeText(MainActivity.this, "Loading", Toast.LENGTH_SHORT).show();
+            Bundle bundle = data.getExtras();
+            if(bundle == null){
+                Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Bitmap bitmap = (Bitmap) bundle.get("data");
 
-        // Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+            // Source: https://firebase.google.com/docs/ml/android/recognize-text?utm_source=studio#before-you-begin
 
-        // Scale down bitmap size
-        // bitmap = scaleBitmapDown(bitmap, 640);
+            // Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
 
-        // Convert bitmap to base64 encoded string
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-        byte[] imageBytes = byteArrayOutputStream.toByteArray();
-        String base64encoded = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
+            // Scale down bitmap size
+            // bitmap = scaleBitmapDown(bitmap, 640);
 
-        mFunctions = FirebaseFunctions.getInstance();
+            // Convert bitmap to base64 encoded string
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+            byte[] imageBytes = byteArrayOutputStream.toByteArray();
+            String base64encoded = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
 
-        // Create json request to cloud vision
-        JsonObject request = new JsonObject();
-        // Add image to request
-        JsonObject image = new JsonObject();
-        image.add("content", new JsonPrimitive(base64encoded));
-        request.add("image", image);
-        //Add features to the request
-        JsonObject feature = new JsonObject();
-        feature.add("type", new JsonPrimitive("DOCUMENT_TEXT_DETECTION"));
-        // Alternatively, for DOCUMENT_TEXT_DETECTION:
-        //feature.add("type", new JsonPrimitive("DOCUMENT_TEXT_DETECTION"));
-        JsonArray features = new JsonArray();
-        features.add(feature);
-        request.add("features", features);
+            mFunctions = FirebaseFunctions.getInstance();
 
-        // Optionally, provide language hints to assist with language detection (see supported languages):
-        // TODO: tr ekleyebilirim.
-        JsonObject imageContext = new JsonObject();
-        JsonArray languageHints = new JsonArray();
-        languageHints.add("en");
-        imageContext.add("languageHints", languageHints);
-        request.add("imageContext", imageContext);
+            // Create json request to cloud vision
+            JsonObject request = new JsonObject();
+            // Add image to request
+            JsonObject image = new JsonObject();
+            image.add("content", new JsonPrimitive(base64encoded));
+            request.add("image", image);
+            //Add features to the request
+            JsonObject feature = new JsonObject();
+            feature.add("type", new JsonPrimitive("DOCUMENT_TEXT_DETECTION"));
+            // Alternatively, for DOCUMENT_TEXT_DETECTION:
+            //feature.add("type", new JsonPrimitive("DOCUMENT_TEXT_DETECTION"));
+            JsonArray features = new JsonArray();
+            features.add(feature);
+            request.add("features", features);
 
-        Task<JsonElement> task = annotateImage(request.toString())
-                .addOnCompleteListener(new OnCompleteListener<JsonElement>() {
-                    @Override
-                    public void onComplete(@NonNull Task<JsonElement> task) {
-                        if (!task.isSuccessful()) {
-                            // Task failed with an exception
-                            Log.i("log_text", task.getException().getMessage());
-                        } else {
-                            // Task completed successfully
-                            // textAnnotations'da daha iyi sonuç var gibi.
+            // Optionally, provide language hints to assist with language detection (see supported languages):
+            // TODO: tr ekleyebilirim.
+            JsonObject imageContext = new JsonObject();
+            JsonArray languageHints = new JsonArray();
+            languageHints.add("en");
+            imageContext.add("languageHints", languageHints);
+            request.add("imageContext", imageContext);
 
-                            JsonObject annotation = task.getResult().getAsJsonArray().get(0).getAsJsonObject().get("fullTextAnnotation").getAsJsonObject();
+            Task<JsonElement> task = annotateImage(request.toString())
+                    .addOnCompleteListener(new OnCompleteListener<JsonElement>() {
+                        @Override
+                        public void onComplete(@NonNull Task<JsonElement> task) {
+                            if (!task.isSuccessful()) {
+                                // Task failed with an exception
+                                Log.i("log_text", task.getException().getMessage());
+                            } else {
+                                // Task completed successfully
+                                // textAnnotations'da daha iyi sonuç var gibi.
 
-                            // bir şey dönmeyince null exception
+                                JsonObject annotation = task.getResult().getAsJsonArray().get(0).getAsJsonObject().get("fullTextAnnotation").getAsJsonObject();
 
-                            textToSpeechUtil.startTextToSpeech(annotation.get("text").getAsString());
+                                // bir şey dönmeyince null exception
 
-                            Log.i("log_text", annotation.get("text").getAsString());
+                                textToSpeechUtil.startTextToSpeech(annotation.get("text").getAsString());
+
+                                Log.i("log_text", annotation.get("text").getAsString());
+                            }
                         }
-                    }
-                });
+                    });
 
+        }
 
     }
 
@@ -383,15 +403,13 @@ public class MainActivity extends AppCompatActivity
                 });
     }
 
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Toast.makeText(MainActivity.this, connectionResult.getErrorMessage(), Toast.LENGTH_SHORT).show();
+    }
+
 
     // endregion
-
-    // region Text to Speech
-
-
-
-    // endregion
-
 
 
 }
