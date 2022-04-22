@@ -56,7 +56,7 @@ public class TrainYourselfObjectAdapter extends RecyclerView.Adapter<TrainYourse
             }
         });
 
-        imageAdapter = new ImageAdapter(trainYourselfObject.getImagesList(), activity);
+        imageAdapter = new ImageAdapter(trainYourselfObject.getImagesList(), activity, position);
         holder.imagesRecyclerView.setAdapter(imageAdapter);
         holder.imagesRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
 

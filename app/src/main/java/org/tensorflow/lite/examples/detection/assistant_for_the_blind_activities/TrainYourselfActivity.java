@@ -2,12 +2,15 @@ package org.tensorflow.lite.examples.detection.assistant_for_the_blind_activitie
 
 import static com.google.android.gms.tasks.Tasks.await;
 
+import static org.tensorflow.lite.examples.detection.assistant_for_the_blind_activities.CropperActivity.RESULT_OK_CROP_IMAGE;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,6 +19,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ClipData;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,7 +31,9 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.SyncStateContract;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -50,12 +56,18 @@ import com.google.firebase.storage.UploadTask;
 
 import org.tensorflow.lite.examples.detection.R;
 import org.tensorflow.lite.examples.detection.adapters.TrainYourselfObjectAdapter;
+import org.tensorflow.lite.examples.detection.helpers.RotateImage;
 import org.tensorflow.lite.examples.detection.models.TrainYourselfDbObject;
 import org.tensorflow.lite.examples.detection.models.TrainYourselfDbRequestObject;
 import org.tensorflow.lite.examples.detection.models.TrainYourselfObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -68,6 +80,9 @@ public class TrainYourselfActivity extends AppCompatActivity
         implements View.OnClickListener {
 
     public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 101;
+    public static final int REQUEST_TAKE_PHOTO = 102;
+    public static final int REQUEST_TAKE_FROM_GALLERY = 103;
+    public static final int REQUEST_CROP_IMAGE = 104;
 
     private AppCompatButton addObjectButton;
     private AppCompatButton trainYourselfButton;
@@ -75,6 +90,7 @@ public class TrainYourselfActivity extends AppCompatActivity
 
     private List<TrainYourselfObject> trainYourselfObjects;
     private int currentObjectIndex;
+    private Uri addedImageUri;
     private TrainYourselfObjectAdapter adapter;
     private Dialog dialog;
     private FirebaseAuth mAuth;
@@ -165,15 +181,19 @@ public class TrainYourselfActivity extends AppCompatActivity
             public void onClick(DialogInterface dialogInterface, int i) {
                 if(optionsMenu[i].equals("Take Photo")){
                     // Open the camera and get the photo
-                    Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(takePicture, 0);
-
+                    ContentValues values = new ContentValues();
+                    values.put(MediaStore.Images.Media.TITLE, "MyPicture");
+                    values.put(MediaStore.Images.Media.DESCRIPTION, "Photo taken on " + System.currentTimeMillis());
+                    addedImageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, addedImageUri);
+                    startActivityForResult(intent, REQUEST_TAKE_PHOTO);
                 }
                 else if(optionsMenu[i].equals("Choose from Gallery")){
                     // choose from  external storage
                     Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     pickPhoto.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                    startActivityForResult(pickPhoto , 1);
+                    startActivityForResult(pickPhoto , REQUEST_TAKE_FROM_GALLERY);
                 }
                 else if (optionsMenu[i].equals("Exit")) {
                     dialogInterface.dismiss();
@@ -183,20 +203,29 @@ public class TrainYourselfActivity extends AppCompatActivity
         builder.show();
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode != RESULT_CANCELED) {
             switch (requestCode) {
-                case 0:
-                    if (resultCode == RESULT_OK && data != null) {
-                        Bitmap selectedImage = (Bitmap) data.getExtras().get("data");
+                case REQUEST_TAKE_PHOTO:  // Take photo result
+                    if (resultCode == RESULT_OK) {
+                        Bitmap bitmap = null;
+                        try {
+                            bitmap = RotateImage.getCorrectlyOrientedImage(TrainYourselfActivity.this, addedImageUri, 2000);
+                            // bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), addedImageUri);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
 
-                        trainYourselfObjects.get(currentObjectIndex).addImageToImageList(selectedImage);
+                        trainYourselfObjects.get(currentObjectIndex).addImageToImageList(bitmap);
                         adapter.notifyDataSetChanged();
                     }
                     break;
-                case 1:
+                case REQUEST_TAKE_FROM_GALLERY:  // Get from gallery result
                     if (resultCode == RESULT_OK && data != null) {
                         try {
                             // Get the Image from data
@@ -204,6 +233,7 @@ public class TrainYourselfActivity extends AppCompatActivity
                             if(data.getData()!=null){
 
                                 Uri mImageUri=data.getData();
+                                Log.i("uri_test", mImageUri.toString());
 
                                 // Get the cursor
                                 Cursor cursor = getContentResolver().query(mImageUri,
@@ -250,6 +280,23 @@ public class TrainYourselfActivity extends AppCompatActivity
 
                     }
                     break;
+                case REQUEST_CROP_IMAGE:
+                    if(resultCode == RESULT_OK_CROP_IMAGE){
+                         String result = data.getStringExtra("result");
+                         int objectIndex = data.getIntExtra("objectIndex", -1);
+                         int imageIndex = data.getIntExtra("imageIndex", -1);
+                         Uri resultUri = null;
+                         if(result != null){
+                             resultUri = Uri.parse(result);
+                         }
+                        try {
+                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), resultUri);
+                            trainYourselfObjects.get(objectIndex).getImagesList().set(imageIndex, bitmap);
+                            adapter.notifyDataSetChanged();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
             }
         }
     }
@@ -408,6 +455,8 @@ public class TrainYourselfActivity extends AppCompatActivity
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
     }
+
+
 
 
 }
