@@ -30,20 +30,15 @@ import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder> {
     List<Bitmap> imagesList;
+    List<Uri> imageUrisList;
     Activity activity;
     int ownerObjectIndex;
 
-    public ImageAdapter(List<Bitmap> imagesList, Activity activity, int ownerObjectIndex) {
+    public ImageAdapter(List<Bitmap> imagesList, List<Uri> imageUrisList, Activity activity, int ownerObjectIndex) {
         this.imagesList = imagesList;
+        this.imageUrisList = imageUrisList;
         this.activity = activity;
         this.ownerObjectIndex = ownerObjectIndex;
-    }
-
-    public Uri getImageUri(Context inContext, Bitmap inImage) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-        return Uri.parse(path);
     }
 
     @NonNull
@@ -63,7 +58,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder
         holder.imageView.setOnClickListener(v -> {
 
             Intent intent = new Intent(activity, CropperActivity.class);
-            intent.putExtra("imageUri", getImageUri(activity, image).toString());
+            intent.putExtra("imageUri", imageUrisList.get(position).toString());
             intent.putExtra("objectIndex", ownerObjectIndex);
             intent.putExtra("imageIndex", position);
             activity.startActivityForResult(intent, REQUEST_CROP_IMAGE);

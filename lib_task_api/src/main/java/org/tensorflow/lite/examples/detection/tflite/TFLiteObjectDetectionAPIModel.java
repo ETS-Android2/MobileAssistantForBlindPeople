@@ -46,11 +46,12 @@ import org.tensorflow.lite.task.vision.detector.ObjectDetector.ObjectDetectorOpt
  * href="https://www.tensorflow.org/lite/convert/metadata#read_the_metadata_from_models">Read the
  * metadata from models</a>
  */
+
 public class TFLiteObjectDetectionAPIModel implements Detector {
   private static final String TAG = "TFLiteObjectDetectionAPIModelWithTaskApi";
 
   /** Only return this many results. */
-  private static final int NUM_DETECTIONS = 10;
+  private static final int NUM_DETECTIONS = 3;
 
   private final MappedByteBuffer modelBuffer;
 

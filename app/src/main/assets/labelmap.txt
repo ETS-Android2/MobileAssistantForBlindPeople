@@ -6,7 +6,7 @@ airplane
 bus
 train
 truck
-boat
+boatl
 traffic light
 fire hydrant
 ???
@@ -44,13 +44,13 @@ tennis racket
 bottle
 ???
 wine glass
-cup
-fork
-knife
-spoon
+bardak
+çatal
+bıçak
+kaşık
 bowl
 banana
-apple
+elma
 sandwich
 orange
 broccoli
@@ -59,32 +59,32 @@ hot dog
 pizza
 donut
 cake
-chair
-couch
+sandalye
+koltuk
 potted plant
-bed
+yatak
 ???
-dining table
+yemek masası
 ???
 ???
-toilet
+tuvalet
 ???
 tv
 laptop
-mouse
-remote
-keyboard
-cell phone
-microwave
-oven
-toaster
-sink
-refrigerator
+fare
+uzaktan kumanda
+klavye
+cep telefonu
+mikrodalga
+fırın
+tost makinası
+musluk
+buzdolabı
 ???
-book
-clock
-vase
-scissors
-teddy bear
-hair drier
-toothbrush
+kitap
+saat
+vazo
+makas
+oyuncak ayı
+saç kurutma makinesi
+diş fırçası

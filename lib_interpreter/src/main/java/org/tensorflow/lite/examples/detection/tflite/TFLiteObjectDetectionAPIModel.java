@@ -54,7 +54,7 @@ import org.tensorflow.lite.support.metadata.MetadataExtractor;
  * https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/running_on_mobile_tensorflowlite.md#running-our-model-on-android
  */
 public class TFLiteObjectDetectionAPIModel implements Detector {
-  private static final String TAG = "TFLiteObjectDetectionAPIModelWithInterpreter";
+  private static final String TAG = "TfModelWithInterpreter";
 
   // Only return this many results.
   private static final int NUM_DETECTIONS = 10;
@@ -119,11 +119,14 @@ public class TFLiteObjectDetectionAPIModel implements Detector {
     final TFLiteObjectDetectionAPIModel d = new TFLiteObjectDetectionAPIModel();
 
     MappedByteBuffer modelFile = loadModelFile(context.getAssets(), modelFilename);
+    // TODO: Burayı model içindeki metadata'dan değil de assets'teki labelmap.txt'den almasını sağlayınca ok oluyor.
+    //  lib_interpreter custom model'da kullanılmıyor ama.
     MetadataExtractor metadata = new MetadataExtractor(modelFile);
+
     try (BufferedReader br =
         new BufferedReader(
             new InputStreamReader(
-                metadata.getAssociatedFile(labelFilename), Charset.defaultCharset()))) {
+                    context.getAssets().open("labelmap.txt"), Charset.defaultCharset()))) { // metadata.getAssociatedFile(labelFilename)
       String line;
       while ((line = br.readLine()) != null) {
         Log.w(TAG, line);

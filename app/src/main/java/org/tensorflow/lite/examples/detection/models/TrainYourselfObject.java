@@ -1,6 +1,7 @@
 package org.tensorflow.lite.examples.detection.models;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Parcelable;
 
 import java.io.Serializable;
@@ -12,11 +13,13 @@ public class TrainYourselfObject implements Serializable {
 
     private String objectName;
     private List<Bitmap> imagesList;
+    private List<Uri> imageUrisList;
     private List<String> storageLinksList;
 
-    public TrainYourselfObject(String objectName, List<Bitmap> imagesList) {
+    public TrainYourselfObject(String objectName) {
         this.objectName = objectName;
-        this.imagesList = imagesList;
+        this.imagesList = new ArrayList<>();
+        this.imageUrisList = new ArrayList<>();
         this.storageLinksList = new ArrayList<>();
     }
 
@@ -32,6 +35,10 @@ public class TrainYourselfObject implements Serializable {
         imagesList.add(bitmap);
     }
 
+    public void addImageUriToImageUrisList(Uri uri){
+        imageUrisList.add(uri);
+    }
+
     public List<Bitmap> getImagesList() {
         return imagesList;
     }
@@ -42,6 +49,14 @@ public class TrainYourselfObject implements Serializable {
 
     public void addNewLinkToStorageLinksList(String storageLink){
         storageLinksList.add(storageLink);
+    }
+
+    public List<Uri> getImageUrisList() {
+        return imageUrisList;
+    }
+
+    public void setImageUrisList(List<Uri> imageUrisList) {
+        this.imageUrisList = imageUrisList;
     }
 
     public List<String> getStorageLinksList() {

@@ -29,6 +29,8 @@ import android.media.ImageReader.OnImageAvailableListener;
 import android.os.SystemClock;
 import android.util.Size;
 import android.util.TypedValue;
+import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.Toast;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -54,6 +56,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private static final int TF_OD_API_INPUT_SIZE = 300;
   private static final boolean TF_OD_API_IS_QUANTIZED = true;
   private static final String TF_OD_API_MODEL_FILE = "detect.tflite";
+  // private static final String TF_OD_API_MODEL_FILE = "modelSonD.tflite";
   private static final String TF_OD_API_LABELS_FILE = "labelmap.txt";
   private static final DetectorMode MODE = DetectorMode.TF_OD_API;
   // Minimum detection confidence to track a detection.
@@ -188,8 +191,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
             // TODO: Sadece ekrandaki yeri mi verilebiliyor? Location'a dair bir şey var mı bakılacak?
             // TODO: Türkçe okuyor, tanıdıklarının isimleri ingilizce. Onlar türkçe'ye çevrilebilir.
 
-            if(!textToSpeechUtil.isSpeaking())
-              textToSpeechUtil.startTextToSpeech(results.get(0).getTitle());
+            //if(!textToSpeechUtil.isSpeaking())
+              //textToSpeechUtil.startTextToSpeech(results.get(0).getTitle());
 
             lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
 
@@ -227,15 +230,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
             computingDetection = false;
 
-            runOnUiThread(
-                new Runnable() {
-                  @Override
-                  public void run() {
-                    showFrameInfo(previewWidth + "x" + previewHeight);
-                    showCropInfo(cropCopyBitmap.getWidth() + "x" + cropCopyBitmap.getHeight());
-                    showInference(lastProcessingTimeMs + "ms");
-                  }
-                });
           }
         });
   }
@@ -248,6 +242,16 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   @Override
   protected Size getDesiredPreviewFrameSize() {
     return DESIRED_PREVIEW_SIZE;
+  }
+
+  @Override
+  public void onClick(View v) {
+
+  }
+
+  @Override
+  public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
   }
 
   // Which detection model to use: by default uses Tensorflow Object Detection API frozen

@@ -128,7 +128,7 @@ public class TrainYourselfActivity extends AppCompatActivity
     // function to check permission
     public static boolean checkAndRequestPermissions(final Activity context) {
         int WExtstorePermission = ContextCompat.checkSelfPermission(context,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);  // TODO: Write istendi, Read istenmedi?
         int cameraPermission = ContextCompat.checkSelfPermission(context,
                 Manifest.permission.CAMERA);
         List<String> listPermissionsNeeded = new ArrayList<>();
@@ -157,12 +157,12 @@ public class TrainYourselfActivity extends AppCompatActivity
                 if (ContextCompat.checkSelfPermission(TrainYourselfActivity.this,
                         Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(getApplicationContext(),
-                            "FlagUp Requires Access to Camara.", Toast.LENGTH_SHORT)
+                            "Kamera erişimi gereklidir.", Toast.LENGTH_SHORT)
                             .show();
                 } else if (ContextCompat.checkSelfPermission(TrainYourselfActivity.this,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(getApplicationContext(),
-                            "FlagUp Requires Access to Your Storage.",
+                            "Storage erişimi gereklidir.",
                             Toast.LENGTH_SHORT).show();
                 }
                 break;
@@ -222,6 +222,7 @@ public class TrainYourselfActivity extends AppCompatActivity
                         }
 
                         trainYourselfObjects.get(currentObjectIndex).addImageToImageList(bitmap);
+                        trainYourselfObjects.get(currentObjectIndex).addImageUriToImageUrisList(addedImageUri);
                         adapter.notifyDataSetChanged();
                     }
                     break;
@@ -232,7 +233,7 @@ public class TrainYourselfActivity extends AppCompatActivity
                             String[] filePathColumn = { MediaStore.Images.Media.DATA };
                             if(data.getData()!=null){
 
-                                Uri mImageUri=data.getData();
+                                Uri mImageUri = data.getData();
                                 Log.i("uri_test", mImageUri.toString());
 
                                 // Get the cursor
@@ -245,6 +246,7 @@ public class TrainYourselfActivity extends AppCompatActivity
                                 String picturePath = cursor.getString(columnIndex);
 
                                 trainYourselfObjects.get(currentObjectIndex).addImageToImageList(BitmapFactory.decodeFile(picturePath));
+                                trainYourselfObjects.get(currentObjectIndex).addImageUriToImageUrisList(mImageUri);
                                 adapter.notifyDataSetChanged();
                                 cursor.close();
 
@@ -266,6 +268,7 @@ public class TrainYourselfActivity extends AppCompatActivity
                                         int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                                         String picturePath = cursor.getString(columnIndex);
                                         trainYourselfObjects.get(currentObjectIndex).addImageToImageList(BitmapFactory.decodeFile(picturePath));
+                                        trainYourselfObjects.get(currentObjectIndex).addImageUriToImageUrisList(uri);
                                         cursor.close();
                                     }
                                     adapter.notifyDataSetChanged();
@@ -274,7 +277,7 @@ public class TrainYourselfActivity extends AppCompatActivity
                             }
 
                         } catch (Exception e) {
-                            Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
+                            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG)
                                     .show();
                         }
 
@@ -292,6 +295,7 @@ public class TrainYourselfActivity extends AppCompatActivity
                         try {
                             Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), resultUri);
                             trainYourselfObjects.get(objectIndex).getImagesList().set(imageIndex, bitmap);
+                            trainYourselfObjects.get(objectIndex).getImageUrisList().set(imageIndex, resultUri);
                             adapter.notifyDataSetChanged();
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -447,7 +451,7 @@ public class TrainYourselfActivity extends AppCompatActivity
 
         acceptUsernameButton.setOnClickListener(v -> {
             String newObjectName = etNewObject.getText().toString().trim();
-            trainYourselfObjects.add(new TrainYourselfObject(newObjectName, new LinkedList<>()));
+            trainYourselfObjects.add(new TrainYourselfObject(newObjectName));
             adapter.notifyDataSetChanged();
             dialog.dismiss();
         });

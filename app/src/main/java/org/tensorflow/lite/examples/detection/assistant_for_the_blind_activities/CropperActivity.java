@@ -37,7 +37,7 @@ public class CropperActivity extends AppCompatActivity {
         UCrop.of(fileUri, Uri.fromFile(new File(getCacheDir(), destinationUri)))
                 .withAspectRatio(0, 0)
                 .withOptions(options)
-                .useSourceImageAspectRatio()
+                // .useSourceImageAspectRatio()
                 .start(CropperActivity.this);
     }
 
