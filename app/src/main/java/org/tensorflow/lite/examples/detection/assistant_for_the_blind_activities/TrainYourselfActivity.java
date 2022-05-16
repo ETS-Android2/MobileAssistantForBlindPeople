@@ -99,6 +99,7 @@ public class TrainYourselfActivity extends AppCompatActivity
     private DatabaseReference mDatabase;
     private FirebaseFirestore fStore;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,6 +114,8 @@ public class TrainYourselfActivity extends AppCompatActivity
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
         fStore = FirebaseFirestore.getInstance();
+
+        Log.i("asdasd", mAuth.getCurrentUser().getUid());
 
         trainYourselfButton.setOnClickListener(this);
         addObjectButton.setOnClickListener(this);

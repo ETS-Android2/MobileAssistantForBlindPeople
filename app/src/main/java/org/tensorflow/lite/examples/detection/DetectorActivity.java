@@ -27,12 +27,17 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.media.ImageReader.OnImageAvailableListener;
 import android.os.SystemClock;
+import android.util.Log;
 import android.util.Size;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Toast;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import org.tensorflow.lite.examples.detection.customview.OverlayView;
@@ -40,8 +45,9 @@ import org.tensorflow.lite.examples.detection.customview.OverlayView.DrawCallbac
 import org.tensorflow.lite.examples.detection.env.BorderedText;
 import org.tensorflow.lite.examples.detection.env.ImageUtils;
 import org.tensorflow.lite.examples.detection.env.Logger;
+import org.tensorflow.lite.examples.detection.models.DetectedObject;
 import org.tensorflow.lite.examples.detection.tflite.Detector;
-import org.tensorflow.lite.examples.detection.tflite.TFLiteObjectDetectionAPIModel;
+import org.tensorflow.lite.examples.detection.tflite.TFLiteObjectDetectionAPIModel2;
 import org.tensorflow.lite.examples.detection.tracking.MultiBoxTracker;
 import org.tensorflow.lite.examples.detection.utils.TextToSpeechUtil;
 
@@ -55,7 +61,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   // Configuration values for the prepackaged SSD model.
   private static final int TF_OD_API_INPUT_SIZE = 300;
   private static final boolean TF_OD_API_IS_QUANTIZED = true;
-  private static final String TF_OD_API_MODEL_FILE = "detect.tflite";
+  // private static final String TF_OD_API_MODEL_FILE = "detect.tflite";
+  private static final String TF_OD_API_MODEL_FILE = "modelKaldiracVeSarj.tflite";
   // private static final String TF_OD_API_MODEL_FILE = "modelSonD.tflite";
   private static final String TF_OD_API_LABELS_FILE = "labelmap.txt";
   private static final DetectorMode MODE = DetectorMode.TF_OD_API;
@@ -87,6 +94,11 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private BorderedText borderedText;
   private TextToSpeechUtil textToSpeechUtil;
 
+  private final float focalLength = (float) 5.23;  // Benim telefonumda bu şekilde. Bu direkt kameradan döndüğü.
+  private final float sensorHeight = (float) 5.5488;      // mm cinsinden.   // 0 -> 5.5488   1 -> 3.168
+  private int cropSize;
+  private List<DetectedObject> modelObjects;
+
   @Override
   public void onPreviewSizeChosen(final Size size, final int rotation) {
     final float textSizePx =
@@ -99,11 +111,29 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     textToSpeechUtil = new TextToSpeechUtil(getApplicationContext());
     textToSpeechUtil.setupTextToSpeech();
 
-    int cropSize = TF_OD_API_INPUT_SIZE;
+    // TODO get detectedObject sizes and turkish names
+    modelObjects = new ArrayList<>();
+    try (BufferedReader br =
+                 new BufferedReader(
+                         new InputStreamReader(
+                                 getAssets().open("labelmap.txt"), Charset.defaultCharset()))) { // metadata.getAssociatedFile(labelFilename)
+      String line = null;
+      while ((line = br.readLine()) != null) {
+        if(line.equals("???"))
+          continue;
+
+        String[] components = line.split(",");
+        modelObjects.add(new DetectedObject(components[0], components[2], Integer.parseInt(components[1])));
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    cropSize = TF_OD_API_INPUT_SIZE;
 
     try {
       detector =
-          TFLiteObjectDetectionAPIModel.create(
+          TFLiteObjectDetectionAPIModel2.create(
               this,
               TF_OD_API_MODEL_FILE,
               TF_OD_API_LABELS_FILE,
@@ -216,6 +246,38 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
             for (final Detector.Recognition result : results) {
               final RectF location = result.getLocation();
               if (location != null && result.getConfidence() >= minimumConfidence) {
+                // Sonuç minimum confidence'tan daha yüksekse
+
+                float objectHeightInPixels = location.height();
+                int imageHeightInPixels = cropSize;
+                int realObjectHeightInMm = 0;
+                String objectTurkishName = "";
+
+                /*
+                for(int i = 0; i < modelObjects.size(); i++){
+                    if(modelObjects.get(i).getObjectName().equals(result.getTitle())){
+                       realObjectHeightInMm = modelObjects.get(i).getObjectRealSizeInMm();
+                       objectTurkishName = modelObjects.get(i).getObjectNameTr();
+                       break;
+                    }
+                },
+
+                 */
+                // Log.i("distanceLog", focalLength + " focalLength");
+                // Log.i("distanceLog", laptopRealHeight + " laptopRealHeight");
+                // Log.i("distanceLog", previewHeight + " previewHeight");
+                // Log.i("distanceLog", objectHeightInPixels + " objectHeightInPixels");
+                // Log.i("distanceLog", imageHeightInPixels + " imageHeightInPixels");
+                // Log.i("distanceLog", sensorHeight + " sensorHeight");
+
+                float distanceInMm = (focalLength * (float)realObjectHeightInMm * imageHeightInPixels) / (objectHeightInPixels * sensorHeight);
+
+                // result.setTitle(objectTurkishName + " " + (float)(distanceInMm / 10) + " cm");
+
+                Log.i("distanceLog", objectTurkishName + " : " + distanceInMm);
+
+                //Toast.makeText(DetectorActivity.this, objectTurkishName + " : " + distanceInMm, Toast.LENGTH_SHORT).show();
+
                 canvas.drawRect(location, paint);
 
                 cropToFrameTransform.mapRect(location);

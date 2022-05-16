@@ -74,16 +74,14 @@ dependencies {
     // Also declare the dependency for the TensorFlow Lite library and specify its version
     implementation 'org.tensorflow:tensorflow-lite:2.7.0'
 
-
-    //Recognize text
-    implementation 'com.google.firebase:firebase-functions:20.0.2'
-    implementation 'com.google.code.gson:gson:2.8.6'
-
-
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'com.google.truth:truth:1.0.1'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test:rules:1.1.0'
+
+    //Recognize text
+    implementation 'com.google.firebase:firebase-functions:20.0.2'
+    implementation 'com.google.code.gson:gson:2.8.6'
 
     // Auth
     implementation 'com.google.firebase:firebase-auth'
@@ -91,6 +89,13 @@ dependencies {
 
     // ImageCropper
     implementation 'com.github.krokyze:ucropnedit:2.2.8'
+
+    // Jsoup
+    implementation 'org.jsoup:jsoup:1.10.3'
+
+    // Metadata
+    implementation 'org.tensorflow:tensorflow-lite-metadata:0.1.0'
+
 
 }
 

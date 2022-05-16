@@ -1,13 +1,12 @@
 package org.tensorflow.lite.examples.detection.assistant_for_the_blind_activities;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.ml.modeldownloader.CustomModel;
@@ -17,32 +16,43 @@ import com.google.firebase.ml.modeldownloader.FirebaseModelDownloader;
 
 import org.tensorflow.lite.Interpreter;
 import org.tensorflow.lite.examples.detection.R;
+import org.tensorflow.lite.examples.detection.adapters.ModelsAdapter;
+import org.tensorflow.lite.examples.detection.models.ObjectDetectionModel;
+import org.tensorflow.lite.support.metadata.MetadataExtractor;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class SelectModelActivity extends AppCompatActivity {
 
-    List<String> downloadedModelNames;
+    List<CustomModel> downloadedModels;
     FirebaseAuth mAuth;
+    ModelsAdapter modelsAdapter;
+    RecyclerView models_recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_model);
 
+        models_recyclerView = findViewById(R.id.models_recyclerView);
         FirebaseApp.initializeApp(getApplicationContext());
         mAuth = FirebaseAuth.getInstance();
-        downloadedModelNames = new ArrayList<>();
+        downloadedModels = new ArrayList<>();
         final String[] modelToDownloadName = {""};
+        modelsAdapter = new ModelsAdapter(downloadedModels, SelectModelActivity.this, mAuth.getUid());
+        models_recyclerView.setAdapter(modelsAdapter);
+        models_recyclerView.setLayoutManager(new LinearLayoutManager(SelectModelActivity.this));
 
+        // Get downloaded models and download if there's new model
         FirebaseModelDownloader.getInstance()
                 .listDownloadedModels()
                 .addOnSuccessListener(customModels -> {
                     for(CustomModel model: customModels){
-                        downloadedModelNames.add(model.getName());
+                        addNewModel(model);
+
                         Log.i("deneme", "indirilmiş: " + model.getName());
                     }
 
@@ -51,7 +61,7 @@ public class SelectModelActivity extends AppCompatActivity {
                     int modelIndex = 1;
 
                     while(modelAlreadyDownloaded){
-                        if(downloadedModelNames.contains(modelToDownloadName[0])){
+                        if(isModelAlreadyDownloaded(modelIndex)){
                             modelIndex++;
                             modelToDownloadName[0] = mAuth.getCurrentUser().getUid() + "-" + modelIndex;
                         }
@@ -62,7 +72,7 @@ public class SelectModelActivity extends AppCompatActivity {
                     Log.i("deneme", "modelToDownloadName: " + modelToDownloadName[0]);
 
                     CustomModelDownloadConditions conditions = new CustomModelDownloadConditions.Builder()
-                            .requireWifi()  // Also possible: .requireCharging() and .requireDeviceIdle()
+                            // .requireWifi()  // Also possible: .requireCharging() and .requireDeviceIdle()
                             .build();
                     FirebaseModelDownloader.getInstance()
                             .getModel(modelToDownloadName[0], DownloadType.LATEST_MODEL, conditions)
@@ -72,9 +82,13 @@ public class SelectModelActivity extends AppCompatActivity {
 
                                 // The CustomModel object contains the local path of the model file,
                                 // which you can use to instantiate a TensorFlow Lite interpreter.
+                                addNewModel(model);
+
                                 File modelFile = model.getFile();
                                 if (modelFile != null) {
-                                    // interpreter = new Interpreter(modelFile);
+                                    // InputStream stream = MetadataExtractor.getAssociatedFile(modelFile);
+
+                                    // Interpreter interpreter = new Interpreter(modelFile);
                                 }
                                 Log.i("deneme", "download complete: " + modelFile.getName());
                             })
@@ -84,6 +98,23 @@ public class SelectModelActivity extends AppCompatActivity {
 
                 })
                 .addOnFailureListener(e -> Log.i("deneme", e.getMessage()));
-
     }
+
+    private boolean isModelAlreadyDownloaded(int modelIndex){
+
+        for(CustomModel objectDetectionModel : downloadedModels){
+            if(objectDetectionModel.getName().endsWith(String.valueOf(modelIndex)))
+                return true;
+        }
+
+        return false;
+    }
+
+    private void addNewModel(CustomModel model){
+        downloadedModels.add(model);
+        modelsAdapter.notifyDataSetChanged();
+    }
+
+
+
 }

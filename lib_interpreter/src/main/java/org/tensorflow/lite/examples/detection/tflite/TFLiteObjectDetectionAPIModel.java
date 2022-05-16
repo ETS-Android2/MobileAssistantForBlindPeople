@@ -53,7 +53,7 @@ import org.tensorflow.lite.support.metadata.MetadataExtractor;
  * -
  * https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/running_on_mobile_tensorflowlite.md#running-our-model-on-android
  */
-public class TFLiteObjectDetectionAPIModel implements Detector {
+ class TFLiteObjectDetectio222APIModel implements Detector {
   private static final String TAG = "TfModelWithInterpreter";
 
   // Only return this many results.
@@ -88,7 +88,7 @@ public class TFLiteObjectDetectionAPIModel implements Detector {
   private Interpreter.Options tfLiteOptions;
   private Interpreter tfLite;
 
-  private TFLiteObjectDetectionAPIModel() {}
+  private TFLiteObjectDetectio222APIModel() {}
 
   /** Memory-map the model file in Assets. */
   private static MappedByteBuffer loadModelFile(AssetManager assets, String modelFilename)
@@ -116,7 +116,7 @@ public class TFLiteObjectDetectionAPIModel implements Detector {
       final int inputSize,
       final boolean isQuantized)
       throws IOException {
-    final TFLiteObjectDetectionAPIModel d = new TFLiteObjectDetectionAPIModel();
+    final TFLiteObjectDetectio222APIModel d = new TFLiteObjectDetectio222APIModel();
 
     MappedByteBuffer modelFile = loadModelFile(context.getAssets(), modelFilename);
     // TODO: Burayı model içindeki metadata'dan değil de assets'teki labelmap.txt'den almasını sağlayınca ok oluyor.

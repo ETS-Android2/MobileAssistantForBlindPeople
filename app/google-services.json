@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1078705885324",
+    "firebase_url": "https://mobileassistantfortheblind-default-rtdb.firebaseio.com",
+    "project_id": "mobileassistantfortheblind",
+    "storage_bucket": "mobileassistantfortheblind.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1078705885324:android:6286b4cb3b33982588eba9",
+        "android_client_info": {
+          "package_name": "org.tensorflow.lite.examples.detection"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1078705885324-7dj29pjfcltsk63r1oat0t21sdl6fcmi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.tensorflow.lite.examples.detection",
+            "certificate_hash": "d65223a599b0fff59ab5637993ec10905fbc8372"
+          }
+        },
+        {
+          "client_id": "1078705885324-icnev9nnrad0l1sq2c1bud1j4di3pj1m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD949Rh0wFI1c4Mb6GUKCeQ_N20pOyCHNU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1078705885324-icnev9nnrad0l1sq2c1bud1j4di3pj1m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

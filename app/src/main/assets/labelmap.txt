@@ -1,90 +1,91 @@
-person
-bicycle
-car
-motorcycle
-airplane
-bus
-train
-truck
-boatl
-traffic light
-fire hydrant
 ???
-stop sign
-parking meter
-bench
-bird
-cat
-dog
-horse
-sheep
-cow
-elephant
-bear
-zebra
-giraffe
+person,1800,insan
+bicycle,500,bisiklet
+car,1500,araba
+motorcycle,1200,motosiklet
+airplane,10000,uçak
+bus,3000,otobüs
+train,4000,tren
+truck,4250,kamyon
+boat,3000,bot
+traffic light,1000,trafik ışığı
+fire hydrant,1000,yangın musluğu
 ???
-backpack
-umbrella
+stop sign,1000,dur işareti
+parking meter,1000,parkmetre
+bench,500,bank
+bird,200,kuş
+cat,240,kedi
+dog,500,köpek
+horse,1500,at
+sheep,1200,koyun
+cow,1700,inek
+elephant,3000,fil
+bear,2000,ayı
+zebra,2000,zebra
+giraffe,5000,zürafa
 ???
-???
-handbag
-tie
-suitcase
-frisbee
-skis
-snowboard
-sports ball
-kite
-baseball bat
-baseball glove
-skateboard
-surfboard
-tennis racket
-bottle
-???
-wine glass
-bardak
-çatal
-bıçak
-kaşık
-bowl
-banana
-elma
-sandwich
-orange
-broccoli
-carrot
-hot dog
-pizza
-donut
-cake
-sandalye
-koltuk
-potted plant
-yatak
-???
-yemek masası
+backpack,500,sırt çantası
+umbrella,500,şemsiye
 ???
 ???
-tuvalet
+handbag,250,el çantası
+tie,500,kravat
+suitcase,550,bavul
+frisbee,210,frizbi
+skis,1200,kayak
+snowboard,1500,snowboard
+sports ball,700,top
+kite,500,uçurtma
+baseball bat,700,beyzbol sopası
+baseball glove,250,beyzbol eldiveni
+skateboard,300,kaykay
+surfboard,2000,sörf tahtası
+tennis racket,700,tenis raketi
+bottle,150,şişe
 ???
-tv
-laptop
-fare
-uzaktan kumanda
-klavye
-cep telefonu
-mikrodalga
-fırın
-tost makinası
-musluk
-buzdolabı
+wine glass,160,şarap bardağı
+cup,100,bardak
+fork,150,çatal
+knife,150,bıçak
+spoon,150,kaşık
+bowl,100,kase
+banana,100,muz
+apple,100,elma
+sandwich,100,sandviç
+orange,100,portakal
+broccoli,150,brokoli
+carrot,150,havuç
+hot dog,150,sosisli sandviç
+pizza,150,pizza
+donut,150,çörek
+cake,200,pasta
+chair,1100,sandalye
+couch,1100,koltuk
+potted plant,300,saksı bitkisi
+bed,600,yatak
 ???
-kitap
-saat
-vazo
-makas
-oyuncak ayı
-saç kurutma makinesi
-diş fırçası
+dining table,750,yemek masası
+???
+???
+toilet,600,tuvalet
+???
+tv,350,tv
+laptop,250,laptop
+mouse,40,fare
+remote,200,uzaktan kumanda
+keyboard,200,klavye
+cell phone,150,cep telefonu
+microwave,350,mikrodalga
+oven,350,fırın
+toaster,120, tost makinası
+sink,200,musluk
+refrigerator,1900,buzdolabı
+???
+book,70,kitap
+clock,300,saat
+vase,350,vazo
+scissors,150,makas
+teddy bear,400,oyuncak ayı
+hair drier,150,saç kurutma makinesi
+toothbrush,200,diş fırçası

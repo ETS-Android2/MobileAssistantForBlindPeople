@@ -35,7 +35,7 @@ public class CropperActivity extends AppCompatActivity {
         options.setMaxBitmapSize(10000);
 
         UCrop.of(fileUri, Uri.fromFile(new File(getCacheDir(), destinationUri)))
-                .withAspectRatio(0, 0)
+                // .withAspectRatio(0, 0)
                 .withOptions(options)
                 // .useSourceImageAspectRatio()
                 .start(CropperActivity.this);

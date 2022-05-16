@@ -19,7 +19,7 @@ public class TextToSpeechUtil {
 
         textToSpeech = new android.speech.tts.TextToSpeech(mContext, status -> {
             if (status == android.speech.tts.TextToSpeech.SUCCESS) {
-                // TODO Burası önemli, burayı değiştirdim, TR değil, istiklalde öyle.
+                // TODO Burası önemli, burayı değiştirdim
                 Locale loc = new Locale("TR");
                 textToSpeech.setLanguage(loc);
 
