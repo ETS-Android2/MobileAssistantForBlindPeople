@@ -63,8 +63,8 @@ public class MainActivity extends AppCompatActivity
     private CardView readDocumentCardview;
     private CardView trainYourselfCardview;
     private CardView selectModelCardview;
-    private CardView guideCardview;
-    private CardView voiceCommandCardview;
+    // private CardView guideCardview;
+    // private CardView voiceCommandCardview;
     private SpeechRecognizer speech;
     private Intent recognizerIntent;
     private boolean isListening;
@@ -91,8 +91,8 @@ public class MainActivity extends AppCompatActivity
         readDocumentCardview = findViewById(R.id.read_document_cardview);
         trainYourselfCardview = findViewById(R.id.train_yourself_cardview);
         selectModelCardview = findViewById(R.id.select_model_cardview);
-        guideCardview = findViewById(R.id.guide_cardview);
-        voiceCommandCardview = findViewById(R.id.voice_command_cardview);
+        // guideCardview = findViewById(R.id.guide_cardview);
+        // voiceCommandCardview = findViewById(R.id.voice_command_cardview);
 
         loginWithGoogleButton.setOnClickListener(this);
         mainActivityLayout.setOnClickListener(this);
@@ -100,8 +100,8 @@ public class MainActivity extends AppCompatActivity
         readDocumentCardview.setOnClickListener(this);
         trainYourselfCardview.setOnClickListener(this);
         selectModelCardview.setOnClickListener(this);
-        guideCardview.setOnClickListener(this);
-        voiceCommandCardview.setOnClickListener(this);
+        // guideCardview.setOnClickListener(this);
+        // voiceCommandCardview.setOnClickListener(this);
 
         speech = SpeechRecognizer.createSpeechRecognizer(this);
         speech.setRecognitionListener(this);
@@ -142,6 +142,7 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(MainActivity.this, SelectModelActivity.class);
             startActivity(intent);
         }
+        /*
         else if(v.getId() == R.id.guide_cardview){
             Intent intent = new Intent(MainActivity.this, GuideActivity.class);
             startActivity(intent);
@@ -156,6 +157,7 @@ public class MainActivity extends AppCompatActivity
             Log.i(LOG_TAG, "clicked");
 
         }
+         */
     }
 
     // region Google Login

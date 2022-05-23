@@ -14,14 +14,12 @@ import com.google.firebase.ml.modeldownloader.CustomModelDownloadConditions;
 import com.google.firebase.ml.modeldownloader.DownloadType;
 import com.google.firebase.ml.modeldownloader.FirebaseModelDownloader;
 
-import org.tensorflow.lite.Interpreter;
 import org.tensorflow.lite.examples.detection.R;
-import org.tensorflow.lite.examples.detection.adapters.ModelsAdapter;
-import org.tensorflow.lite.examples.detection.models.ObjectDetectionModel;
-import org.tensorflow.lite.support.metadata.MetadataExtractor;
+import org.tensorflow.lite.examples.detection.adapters.CustomModelAdapter;
+import org.tensorflow.lite.examples.detection.adapters.DefaultModelAdapter;
 
 import java.io.File;
-import java.io.InputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,22 +27,42 @@ public class SelectModelActivity extends AppCompatActivity {
 
     List<CustomModel> downloadedModels;
     FirebaseAuth mAuth;
-    ModelsAdapter modelsAdapter;
-    RecyclerView models_recyclerView;
+    DefaultModelAdapter defaultModelAdapter;
+    CustomModelAdapter customModelAdapter;
+    RecyclerView defaultModelsRecyclerView;
+    RecyclerView customModelsRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_model);
 
-        models_recyclerView = findViewById(R.id.models_recyclerView);
+        defaultModelsRecyclerView = findViewById(R.id.defaultModelsRecyclerView);
+        customModelsRecyclerView = findViewById(R.id.customModelsRecyclerView);
         FirebaseApp.initializeApp(getApplicationContext());
         mAuth = FirebaseAuth.getInstance();
         downloadedModels = new ArrayList<>();
         final String[] modelToDownloadName = {""};
-        modelsAdapter = new ModelsAdapter(downloadedModels, SelectModelActivity.this, mAuth.getUid());
-        models_recyclerView.setAdapter(modelsAdapter);
-        models_recyclerView.setLayoutManager(new LinearLayoutManager(SelectModelActivity.this));
+
+        try {
+            String[] filesInAssets = getAssets().list("");
+            List<String> tfliteModelFilesInAssets = new ArrayList<>();
+
+            for(String filename : filesInAssets)
+                if(filename.endsWith(".tflite"))
+                    tfliteModelFilesInAssets.add(filename);
+
+            defaultModelAdapter = new DefaultModelAdapter(tfliteModelFilesInAssets, SelectModelActivity.this);
+            defaultModelsRecyclerView.setAdapter(defaultModelAdapter);
+            defaultModelsRecyclerView.setLayoutManager(new LinearLayoutManager(SelectModelActivity.this));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        customModelAdapter = new CustomModelAdapter(downloadedModels, SelectModelActivity.this, mAuth.getUid());
+        customModelsRecyclerView.setAdapter(customModelAdapter);
+        customModelsRecyclerView.setLayoutManager(new LinearLayoutManager(SelectModelActivity.this));
 
         // Get downloaded models and download if there's new model
         FirebaseModelDownloader.getInstance()
@@ -112,7 +130,7 @@ public class SelectModelActivity extends AppCompatActivity {
 
     private void addNewModel(CustomModel model){
         downloadedModels.add(model);
-        modelsAdapter.notifyDataSetChanged();
+        customModelAdapter.notifyDataSetChanged();
     }
 
 

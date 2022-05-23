@@ -3,13 +3,53 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:orientation="vertical"
     android:layout_height="match_parent"
     tools:context=".assistant_for_the_blind_activities.SelectModelActivity">
 
-
-    <androidx.recyclerview.widget.RecyclerView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:id="@+id/models_recyclerView"
-        android:layout_height="wrap_content"/>
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:layout_weight="1">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:text="Hazır Eğitilmiş Modeller"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:padding="@dimen/dp_5"
+            android:layout_height="wrap_content"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:padding="@dimen/dp_5"
+            android:id="@+id/defaultModelsRecyclerView"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:layout_weight="1">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:text="Eğittiğiniz Modeller"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:padding="@dimen/dp_5"
+            android:layout_height="wrap_content"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:padding="@dimen/dp_5"
+            android:id="@+id/customModelsRecyclerView"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
 
 </LinearLayout>

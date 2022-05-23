@@ -1,11 +1,11 @@
 package org.tensorflow.lite.examples.detection.adapters;
 
-import static org.tensorflow.lite.examples.detection.assistant_for_the_blind_activities.TrainYourselfActivity.checkAndRequestPermissions;
+import static org.tensorflow.lite.examples.detection.utils.Constants.SP_NAME;
 
 import android.app.Activity;
-import android.os.AsyncTask;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,14 +13,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.AppCompatButton;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.ml.modeldownloader.CustomModel;
 
 import org.tensorflow.lite.examples.detection.R;
-import org.tensorflow.lite.examples.detection.models.ObjectDetectionModel;
-import org.tensorflow.lite.examples.detection.models.TrainYourselfObject;
 import org.tensorflow.lite.support.metadata.MetadataExtractor;
 
 import java.io.ByteArrayOutputStream;
@@ -28,31 +25,35 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ModelsAdapter extends RecyclerView.Adapter<ModelsAdapter.MyViewHolder> {
+public class CustomModelAdapter extends RecyclerView.Adapter<CustomModelAdapter.MyViewHolder> {
 
     public static final int DEFAULT_BUFFER_SIZE = 8192;
+    public static final String SELECTED_CUSTOM_MODEL = "SELECTED_CUSTOM_MODEL";
+    public static final String IS_CUSTOM_MODEL_SELECTED = "IS_CUSTOM_MODEL_SELECTED";
     private Activity activity;
     private List<CustomModel> objectDetectionModels;
     private String userID;
+    private SharedPreferences mPrefs;
+    private SharedPreferences.Editor prefsEditor;
 
-
-    public ModelsAdapter(List<CustomModel> objectDetectionModels, Activity activity, String userID) {
+    public CustomModelAdapter(List<CustomModel> objectDetectionModels, Activity activity, String userID) {
         this.objectDetectionModels = objectDetectionModels;
         this.activity = activity;
         this.userID = userID;
+        mPrefs = activity.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
+        prefsEditor = mPrefs.edit();
     }
 
     @NonNull
     @Override
-    public ModelsAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public CustomModelAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(activity);
         View view = inflater.inflate(R.layout.layout_adapter_object_detection_model_item, parent, false);
 
-        return new ModelsAdapter.MyViewHolder(view);
+        return new CustomModelAdapter.MyViewHolder(view);
     }
 
     @Override
@@ -79,7 +80,9 @@ public class ModelsAdapter extends RecyclerView.Adapter<ModelsAdapter.MyViewHold
         }
 
         holder.modelLayout.setOnClickListener(v -> {
-
+            prefsEditor.putString(SELECTED_CUSTOM_MODEL, model.getName());
+            prefsEditor.putBoolean(IS_CUSTOM_MODEL_SELECTED, true);
+            prefsEditor.commit();
         });
 
     }

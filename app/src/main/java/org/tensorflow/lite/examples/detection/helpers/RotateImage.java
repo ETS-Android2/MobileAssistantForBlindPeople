@@ -1,16 +1,21 @@
 package org.tensorflow.lite.examples.detection.helpers;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import org.tensorflow.lite.examples.detection.utils.PathUtil;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 
 public class RotateImage {
 
@@ -27,9 +32,48 @@ public class RotateImage {
         return cursor.getInt(0);
     }
 
+
+    public static Bitmap getCorrectlyOrientedImage(Activity activity, Bitmap bitmap, String filePath) throws IOException, URISyntaxException {
+
+        ExifInterface ei = new ExifInterface(filePath);
+        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_UNDEFINED);
+
+        Bitmap rotatedBitmap = null;
+        switch(orientation) {
+
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                rotatedBitmap = rotateImage(bitmap, 90);
+                break;
+
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                rotatedBitmap = rotateImage(bitmap, 180);
+                break;
+
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                rotatedBitmap = rotateImage(bitmap, 270);
+                break;
+
+            case ExifInterface.ORIENTATION_NORMAL:
+            default:
+                rotatedBitmap = bitmap;
+        }
+
+        return rotatedBitmap;
+    }
+
+    public static Bitmap rotateImage(Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
+                matrix, true);
+    }
+
+
     /**
      * Rotates and shrinks as needed
      */
+    /*
     public static Bitmap getCorrectlyOrientedImage(Context context, Uri photoUri, int maxWidth)
             throws IOException {
 
@@ -76,10 +120,10 @@ public class RotateImage {
         }
         is.close();
 
-        /*
-         * if the orientation is not 0 (or -1, which means we don't know), we
-         * have to do a rotation.
-         */
+
+         // if the orientation is not 0 (or -1, which means we don't know), we
+         // have to do a rotation.
+
         if (orientation > 0) {
             Matrix matrix = new Matrix();
             matrix.postRotate(orientation);
@@ -90,4 +134,5 @@ public class RotateImage {
 
         return srcBitmap;
     }
+    */
 }

@@ -117,6 +117,7 @@ int attr contentInsetRight 0x0
 int attr contentInsetStart 0x0
 int attr contentInsetStartWithNavigation 0x0
 int attr controlBackground 0x0
+int attr coordinatorLayoutStyle 0x0
 int attr customNavigationLayout 0x0
 int attr defaultQueryHint 0x0
 int attr dialogCornerRadius 0x0
@@ -171,8 +172,15 @@ int attr indeterminateProgressStyle 0x0
 int attr initialActivityCount 0x0
 int attr isLightTheme 0x0
 int attr itemPadding 0x0
+int attr keylines 0x0
 int attr lastBaselineToBottomHeight 0x0
 int attr layout 0x0
+int attr layout_anchor 0x0
+int attr layout_anchorGravity 0x0
+int attr layout_behavior 0x0
+int attr layout_dodgeInsetEdges 0x0
+int attr layout_insetEdge 0x0
+int attr layout_keyline 0x0
 int attr lineHeight 0x0
 int attr listChoiceBackgroundIndicator 0x0
 int attr listChoiceIndicatorMultipleAnimated 0x0
@@ -236,6 +244,7 @@ int attr spinnerStyle 0x0
 int attr splitTrack 0x0
 int attr srcCompat 0x0
 int attr state_above_anchor 0x0
+int attr statusBarBackground 0x0
 int attr subMenuArrow 0x0
 int attr submitBackground 0x0
 int attr subtitle 0x0
@@ -668,6 +677,7 @@ int id add 0x0
 int id alertTitle 0x0
 int id async 0x0
 int id blocking 0x0
+int id bottom 0x0
 int id buttonPanel 0x0
 int id checkbox 0x0
 int id checked 0x0
@@ -680,6 +690,7 @@ int id decor_content_parent 0x0
 int id default_activity_button 0x0
 int id dialog_button 0x0
 int id edit_query 0x0
+int id end 0x0
 int id expand_activities_button 0x0
 int id expanded_menu 0x0
 int id forever 0x0
@@ -690,6 +701,7 @@ int id icon_group 0x0
 int id image 0x0
 int id info 0x0
 int id italic 0x0
+int id left 0x0
 int id line1 0x0
 int id line3 0x0
 int id listMode 0x0
@@ -707,6 +719,7 @@ int id parentPanel 0x0
 int id progress_circular 0x0
 int id progress_horizontal 0x0
 int id radio 0x0
+int id right 0x0
 int id right_icon 0x0
 int id right_side 0x0
 int id screen 0x0
@@ -730,6 +743,7 @@ int id split_action_bar 0x0
 int id src_atop 0x0
 int id src_in 0x0
 int id src_over 0x0
+int id start 0x0
 int id submenuarrow 0x0
 int id submit_area 0x0
 int id tabMode 0x0
@@ -749,6 +763,7 @@ int id time 0x0
 int id title 0x0
 int id titleDividerNoCustom 0x0
 int id title_template 0x0
+int id top 0x0
 int id topPanel 0x0
 int id unchecked 0x0
 int id uniform 0x0
@@ -758,6 +773,7 @@ int integer abc_config_activityDefaultDur 0x0
 int integer abc_config_activityShortDur 0x0
 int integer cancel_button_image_alpha 0x0
 int integer config_tooltipAnimTime 0x0
+int integer google_play_services_version 0x0
 int integer status_bar_notification_info_maxnum 0x0
 int interpolator btn_checkbox_checked_mtrl_animation_interpolator_0 0x0
 int interpolator btn_checkbox_checked_mtrl_animation_interpolator_1 0x0
@@ -832,6 +848,7 @@ int string abc_searchview_description_voice 0x0
 int string abc_shareactionprovider_share_with 0x0
 int string abc_shareactionprovider_share_with_application 0x0
 int string abc_toolbar_collapse_description 0x0
+int string common_google_play_services_unknown_issue 0x0
 int string search_menu_title 0x0
 int string status_bar_notification_info_overflow 0x0
 int style AlertDialog_AppCompat 0x0
@@ -1183,6 +1200,7 @@ int style Widget_AppCompat_Toolbar 0x0
 int style Widget_AppCompat_Toolbar_Button_Navigation 0x0
 int style Widget_Compat_NotificationActionContainer 0x0
 int style Widget_Compat_NotificationActionText 0x0
+int style Widget_Support_CoordinatorLayout 0x0
 int[] styleable ActionBar { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 }
 int styleable ActionBar_background 0
 int styleable ActionBar_backgroundSplit 1
@@ -1429,6 +1447,17 @@ int styleable CompoundButton_android_button 0
 int styleable CompoundButton_buttonCompat 1
 int styleable CompoundButton_buttonTint 2
 int styleable CompoundButton_buttonTintMode 3
+int[] styleable CoordinatorLayout { 0x0, 0x0 }
+int styleable CoordinatorLayout_keylines 0
+int styleable CoordinatorLayout_statusBarBackground 1
+int[] styleable CoordinatorLayout_Layout { 0x10100b3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 }
+int styleable CoordinatorLayout_Layout_android_layout_gravity 0
+int styleable CoordinatorLayout_Layout_layout_anchor 1
+int styleable CoordinatorLayout_Layout_layout_anchorGravity 2
+int styleable CoordinatorLayout_Layout_layout_behavior 3
+int styleable CoordinatorLayout_Layout_layout_dodgeInsetEdges 4
+int styleable CoordinatorLayout_Layout_layout_insetEdge 5
+int styleable CoordinatorLayout_Layout_layout_keyline 6
 int[] styleable DrawerArrowToggle { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 }
 int styleable DrawerArrowToggle_arrowHeadLength 0
 int styleable DrawerArrowToggle_arrowShaftLength 1

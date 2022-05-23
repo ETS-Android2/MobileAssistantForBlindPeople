@@ -9,7 +9,8 @@
         android:id="@+id/trainYourselfObjectNameTv"
         android:text="Object Name"
         android:layout_margin="@dimen/dp_5"
-        android:textSize="@dimen/sp_18"
+        android:textSize="@dimen/sp_20"
+        android:textStyle="bold"
         android:textColor="@color/Black"
         android:layout_height="wrap_content"/>
 
@@ -17,19 +18,16 @@
         android:layout_width="match_parent"
         android:id="@+id/add_image_button"
         android:text="Resim ekle"
-        android:layout_height="wrap_content"/>
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:layout_width="match_parent"
-        android:id="@+id/add_images_from_google_button"
-        android:text="Google'dan Resim ekle"
+        android:textSize="@dimen/sp_18"
+        android:textColor="@color/White"
+        android:padding="@dimen/dp_10"
+        android:layout_margin="@dimen/dp_10"
+        android:background="@drawable/bg_round"
         android:layout_height="wrap_content"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:id="@+id/images_recyclerView"
-        android:divider="@null"
-        android:dividerHeight="0dp"
         android:layout_height="wrap_content"/>
 
 </LinearLayout>

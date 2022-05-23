@@ -11,17 +11,28 @@
         android:layout_width="match_parent"
         android:id="@+id/train_yourself_button"
         android:text="Model Oluştur"
+        android:textSize="@dimen/sp_18"
+        android:textColor="@color/White"
+        android:padding="@dimen/dp_10"
+        android:layout_margin="@dimen/dp_10"
+        android:background="@drawable/bg_round"
         android:layout_height="wrap_content"/>
 
     <androidx.appcompat.widget.AppCompatButton
         android:layout_width="match_parent"
         android:id="@+id/add_object_button"
         android:text="Obje ekle"
+        android:textSize="@dimen/sp_18"
+        android:textColor="@color/White"
+        android:padding="@dimen/dp_10"
+        android:layout_margin="@dimen/dp_10"
+        android:background="@drawable/bg_round"
         android:layout_height="wrap_content"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:id="@+id/objects_recyclerView"
+        android:padding="@dimen/dp_10"
         android:divider="@null"
         android:dividerHeight="0dp"
         android:layout_height="wrap_content"/>

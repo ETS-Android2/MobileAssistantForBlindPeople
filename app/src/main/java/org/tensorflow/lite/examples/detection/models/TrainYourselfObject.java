@@ -12,15 +12,17 @@ import java.util.List;
 public class TrainYourselfObject implements Serializable {
 
     private String objectName;
-    private List<Bitmap> imagesList;
+    // private List<Bitmap> imagesList;
+    private List<SelectedCoordinates> selectedCoordinatesList;
     private List<Uri> imageUrisList;
     private List<String> storageLinksList;
 
     public TrainYourselfObject(String objectName) {
         this.objectName = objectName;
-        this.imagesList = new ArrayList<>();
+        // this.imagesList = new ArrayList<>();
         this.imageUrisList = new ArrayList<>();
         this.storageLinksList = new ArrayList<>();
+        this.selectedCoordinatesList = new ArrayList<>();
     }
 
     public String getObjectName() {
@@ -32,13 +34,15 @@ public class TrainYourselfObject implements Serializable {
     }
 
     public void addImageToImageList(Bitmap bitmap){
-        imagesList.add(bitmap);
+        // imagesList.add(bitmap);
+        selectedCoordinatesList.add(new SelectedCoordinates(0, 0, bitmap.getWidth(), bitmap.getHeight()));
     }
 
     public void addImageUriToImageUrisList(Uri uri){
         imageUrisList.add(uri);
     }
 
+    /*
     public List<Bitmap> getImagesList() {
         return imagesList;
     }
@@ -46,9 +50,19 @@ public class TrainYourselfObject implements Serializable {
     public void setImagesList(List<Bitmap> imagesList) {
         this.imagesList = imagesList;
     }
+    */
+    
 
     public void addNewLinkToStorageLinksList(String storageLink){
         storageLinksList.add(storageLink);
+    }
+
+    public List<SelectedCoordinates> getSelectedCoordinatesList() {
+        return selectedCoordinatesList;
+    }
+
+    public void setSelectedCoordinatesList(List<SelectedCoordinates> selectedCoordinatesList) {
+        this.selectedCoordinatesList = selectedCoordinatesList;
     }
 
     public List<Uri> getImageUrisList() {

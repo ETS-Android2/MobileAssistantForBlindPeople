@@ -96,7 +96,6 @@ dependencies {
     // Metadata
     implementation 'org.tensorflow:tensorflow-lite-metadata:0.1.0'
 
-
 }
 
 configurations.all {

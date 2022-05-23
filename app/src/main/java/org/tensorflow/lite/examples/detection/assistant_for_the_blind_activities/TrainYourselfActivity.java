@@ -57,14 +57,17 @@ import com.google.firebase.storage.UploadTask;
 import org.tensorflow.lite.examples.detection.R;
 import org.tensorflow.lite.examples.detection.adapters.TrainYourselfObjectAdapter;
 import org.tensorflow.lite.examples.detection.helpers.RotateImage;
+import org.tensorflow.lite.examples.detection.models.SelectedCoordinates;
 import org.tensorflow.lite.examples.detection.models.TrainYourselfDbObject;
 import org.tensorflow.lite.examples.detection.models.TrainYourselfDbRequestObject;
 import org.tensorflow.lite.examples.detection.models.TrainYourselfObject;
+import org.tensorflow.lite.examples.detection.utils.PathUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -115,14 +118,12 @@ public class TrainYourselfActivity extends AppCompatActivity
         storageReference = storage.getReference();
         fStore = FirebaseFirestore.getInstance();
 
-        Log.i("asdasd", mAuth.getCurrentUser().getUid());
-
         trainYourselfButton.setOnClickListener(this);
         addObjectButton.setOnClickListener(this);
         trainYourselfObjects = new LinkedList<>();
 
         dialog = new Dialog(TrainYourselfActivity.this);
-        adapter = new TrainYourselfObjectAdapter(trainYourselfObjects, TrainYourselfActivity.this);
+        adapter = new TrainYourselfObjectAdapter(trainYourselfObjects, TrainYourselfActivity.this, dialog);
         objectsRecyclerview.setAdapter(adapter);
         objectsRecyclerview.setLayoutManager(new LinearLayoutManager(TrainYourselfActivity.this));
     }
@@ -216,11 +217,15 @@ public class TrainYourselfActivity extends AppCompatActivity
                     if (resultCode == RESULT_OK) {
                         Bitmap bitmap = null;
                         try {
-                            bitmap = RotateImage.getCorrectlyOrientedImage(TrainYourselfActivity.this, addedImageUri, 2000);
-                            // bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), addedImageUri);
+                            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), addedImageUri);
+                            String filePath = PathUtil.getPath(getApplicationContext(), addedImageUri);
+                            bitmap = RotateImage.getCorrectlyOrientedImage(TrainYourselfActivity.this, bitmap, filePath);
+                            // bitmap = RotateImage.getCorrectlyOrientedImage(TrainYourselfActivity.this, addedImageUri, 10000);
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
                         } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (URISyntaxException e) {
                             e.printStackTrace();
                         }
 
@@ -234,7 +239,7 @@ public class TrainYourselfActivity extends AppCompatActivity
                         try {
                             // Get the Image from data
                             String[] filePathColumn = { MediaStore.Images.Media.DATA };
-                            if(data.getData()!=null){
+                            if(data.getData() !=null){
 
                                 Uri mImageUri = data.getData();
                                 Log.i("uri_test", mImageUri.toString());
@@ -248,7 +253,11 @@ public class TrainYourselfActivity extends AppCompatActivity
                                 int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                                 String picturePath = cursor.getString(columnIndex);
 
-                                trainYourselfObjects.get(currentObjectIndex).addImageToImageList(BitmapFactory.decodeFile(picturePath));
+                                // Exif information
+                                Bitmap bitmap = BitmapFactory.decodeFile(picturePath);
+                                bitmap = RotateImage.getCorrectlyOrientedImage(TrainYourselfActivity.this, bitmap, picturePath);
+
+                                trainYourselfObjects.get(currentObjectIndex).addImageToImageList(bitmap);
                                 trainYourselfObjects.get(currentObjectIndex).addImageUriToImageUrisList(mImageUri);
                                 adapter.notifyDataSetChanged();
                                 cursor.close();
@@ -270,7 +279,9 @@ public class TrainYourselfActivity extends AppCompatActivity
 
                                         int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                                         String picturePath = cursor.getString(columnIndex);
-                                        trainYourselfObjects.get(currentObjectIndex).addImageToImageList(BitmapFactory.decodeFile(picturePath));
+                                        Bitmap bitmap = BitmapFactory.decodeFile(picturePath);
+                                        bitmap = RotateImage.getCorrectlyOrientedImage(TrainYourselfActivity.this, bitmap, picturePath);
+                                        trainYourselfObjects.get(currentObjectIndex).addImageToImageList(bitmap);
                                         trainYourselfObjects.get(currentObjectIndex).addImageUriToImageUrisList(uri);
                                         cursor.close();
                                     }
@@ -291,10 +302,22 @@ public class TrainYourselfActivity extends AppCompatActivity
                          String result = data.getStringExtra("result");
                          int objectIndex = data.getIntExtra("objectIndex", -1);
                          int imageIndex = data.getIntExtra("imageIndex", -1);
+                         int minX = data.getIntExtra("minX", -1);
+                         int maxX = data.getIntExtra("maxX", -1);
+                         int minY = data.getIntExtra("minY", -1);
+                         int maxY = data.getIntExtra("maxY", -1);
                          Uri resultUri = null;
                          if(result != null){
                              resultUri = Uri.parse(result);
                          }
+
+                         // Seçilmiş alanı kaydet.
+                        trainYourselfObjects.get(objectIndex).getSelectedCoordinatesList().
+                                set(imageIndex, new SelectedCoordinates(minX, minY, maxX, maxY));
+                         adapter.notifyDataSetChanged();
+
+                         // IMP: Sadece crop edilmiş kısım tutuluyordu, şimdi tüm resim ve seçilmiş alan tutulacak.
+                         /*
                         try {
                             Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), resultUri);
                             trainYourselfObjects.get(objectIndex).getImagesList().set(imageIndex, bitmap);
@@ -303,6 +326,7 @@ public class TrainYourselfActivity extends AppCompatActivity
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+                        */
                     }
             }
         }
@@ -326,7 +350,13 @@ public class TrainYourselfActivity extends AppCompatActivity
              */
 
             // Seçilen tüm image'lar Firebase'e upload edilir ve linkleri bir listeye eklenir.
-            uploadAllImagesAndCreateTrainRequestInDb();
+            try {
+                uploadAllImagesAndCreateTrainRequestInDb();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
 
 
         }
@@ -340,11 +370,16 @@ public class TrainYourselfActivity extends AppCompatActivity
         void onSuccess(String value);
     }
 
-    private void uploadAllImagesAndCreateTrainRequestInDb(){
+    private void uploadAllImagesAndCreateTrainRequestInDb() throws IOException, URISyntaxException {
         int trainYourselfObjectIndex = 0;
         for(TrainYourselfObject trainYourselfObject : trainYourselfObjects){
             int imageIndex = 0;
-            for(Bitmap bitmap : trainYourselfObject.getImagesList()){
+            for(Uri uri : trainYourselfObject.getImageUrisList()){
+
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                String filePath = PathUtil.getPath(getApplicationContext(), uri);
+                bitmap = RotateImage.getCorrectlyOrientedImage(TrainYourselfActivity.this, bitmap, filePath);
+
                 int finalTrainYourselfObjectIndex = trainYourselfObjectIndex;
                 int finalImageIndex = imageIndex;
                 uploadImage(bitmap, new Callback() {
@@ -353,11 +388,17 @@ public class TrainYourselfActivity extends AppCompatActivity
                         trainYourselfObject.addNewLinkToStorageLinksList(value);
                         // Finish
                         if(finalTrainYourselfObjectIndex == trainYourselfObjects.size() - 1
-                            && finalImageIndex == trainYourselfObject.getImagesList().size() - 1){
+                            && finalImageIndex == trainYourselfObject.getImageUrisList().size() - 1){
 
                             List<TrainYourselfDbObject> trainYourselfDbObjects = new ArrayList<>();
                             for(TrainYourselfObject object : trainYourselfObjects){
-                                trainYourselfDbObjects.add(new TrainYourselfDbObject(object.getObjectName(), object.getStorageLinksList()));
+                                trainYourselfDbObjects.add(
+                                        new TrainYourselfDbObject(
+                                                object.getObjectName(),
+                                                object.getStorageLinksList(),
+                                                object.getSelectedCoordinatesList()
+                                        )
+                                );
                             }
 
                             TrainYourselfDbRequestObject requestObject =

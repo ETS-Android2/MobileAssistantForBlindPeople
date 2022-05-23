@@ -3,6 +3,7 @@ package org.tensorflow.lite.examples.detection.adapters;
 import static org.tensorflow.lite.examples.detection.assistant_for_the_blind_activities.TrainYourselfActivity.checkAndRequestPermissions;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,13 +30,14 @@ import java.util.List;
 public class TrainYourselfObjectAdapter extends RecyclerView.Adapter<TrainYourselfObjectAdapter.MyViewHolder>  {
 
     private Activity activity;
+    private Dialog dialog;
     private List<TrainYourselfObject> trainYourselfObjects;
     private ImageAdapter imageAdapter;
 
-
-    public TrainYourselfObjectAdapter(List<TrainYourselfObject> trainYourselfObjects, Activity activity) {
+    public TrainYourselfObjectAdapter(List<TrainYourselfObject> trainYourselfObjects, Activity activity, Dialog dialog) {
         this.trainYourselfObjects = trainYourselfObjects;
         this.activity = activity;
+        this.dialog = dialog;
     }
 
     @NonNull
@@ -54,6 +56,7 @@ public class TrainYourselfObjectAdapter extends RecyclerView.Adapter<TrainYourse
 
         holder.trainYourselfObjectNameTv.setText(trainYourselfObject.getObjectName());
 
+        /*
         holder.addImagesFromGoogleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -65,6 +68,7 @@ public class TrainYourselfObjectAdapter extends RecyclerView.Adapter<TrainYourse
                 });
             }
         });
+         */
 
         holder.addImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,9 +78,10 @@ public class TrainYourselfObjectAdapter extends RecyclerView.Adapter<TrainYourse
             }
         });
 
-        imageAdapter = new ImageAdapter(trainYourselfObject.getImagesList(),
+        imageAdapter = new ImageAdapter(activity,
+                                        dialog,
+                                        trainYourselfObject.getSelectedCoordinatesList(),
                                         trainYourselfObject.getImageUrisList(),
-                                        activity,
                                         position);
         holder.imagesRecyclerView.setAdapter(imageAdapter);
         holder.imagesRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
@@ -115,7 +120,6 @@ public class TrainYourselfObjectAdapter extends RecyclerView.Adapter<TrainYourse
             trainYourselfObjectNameTv = itemView.findViewById(R.id.trainYourselfObjectNameTv);
             imagesRecyclerView = itemView.findViewById(R.id.images_recyclerView);
             addImageButton = itemView.findViewById(R.id.add_image_button);
-            addImagesFromGoogleButton = itemView.findViewById(R.id.add_images_from_google_button);
 
         }
     }

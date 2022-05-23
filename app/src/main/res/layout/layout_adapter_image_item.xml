@@ -7,13 +7,26 @@
     <ImageView
         android:layout_width="@dimen/dp_96"
         android:padding="@dimen/dp_5"
+        android:src="@drawable/imageicon"
+        android:layout_margin="@dimen/dp_10"
         android:id="@+id/imageView"
         android:layout_height="@dimen/dp_96"/>
 
+    <ImageButton
+        android:layout_width="@dimen/dp_48"
+        android:layout_height="@dimen/dp_48"
+        android:id="@+id/deleteImageIcon"
+        android:src="@drawable/ic_baseline_delete_24"
+        android:background="@color/green"
+        android:layout_margin="@dimen/dp_10"
+        android:layout_gravity="center"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Delete özelliği eklenecek"/>
+    <ImageButton
+        android:layout_width="@dimen/dp_48"
+        android:layout_height="@dimen/dp_48"
+        android:id="@+id/showLabeledImageIcon"
+        android:src="@drawable/objecticon"
+        android:layout_margin="@dimen/dp_10"
+        android:layout_gravity="center"/>
 
 </LinearLayout>

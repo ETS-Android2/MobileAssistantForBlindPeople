@@ -17,9 +17,25 @@ package org.tensorflow.lite.examples.detection.tflite;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Trace;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.ml.modeldownloader.CustomModel;
+import com.google.firebase.ml.modeldownloader.CustomModelDownloadConditions;
+import com.google.firebase.ml.modeldownloader.DownloadType;
+import com.google.firebase.ml.modeldownloader.FirebaseModelDownloader;
+
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import org.tensorflow.lite.support.common.FileUtil;
@@ -53,13 +69,16 @@ public class TFLiteObjectDetectionAPIModel2 implements Detector {
   /** Only return this many results. */
   private static final int NUM_DETECTIONS = 3;
 
-  private final MappedByteBuffer modelBuffer;
+  private MappedByteBuffer modelBuffer;
+
+  private File customModelFile;
 
   /** An instance of the driver class to run model inference with Tensorflow Lite. */
   private ObjectDetector objectDetector;
 
   /** Builder of the options used to config the ObjectDetector. */
-  private final ObjectDetectorOptions.Builder optionsBuilder;
+  private ObjectDetectorOptions.Builder optionsBuilder;
+
 
   /**
    * Initializes a native TensorFlow session for classifying images.
@@ -76,17 +95,51 @@ public class TFLiteObjectDetectionAPIModel2 implements Detector {
   public static Detector create(
       final Context context,
       final String modelFilename,
+      final boolean isCustomModel,
       final String labelFilename,
       final int inputSize,
       final boolean isQuantized)
       throws IOException {
-    return new TFLiteObjectDetectionAPIModel2(context, modelFilename);
+    return new TFLiteObjectDetectionAPIModel2(context, modelFilename, isCustomModel);
   }
 
-  private TFLiteObjectDetectionAPIModel2(Context context, String modelFilename) throws IOException {
-    modelBuffer = FileUtil.loadMappedFile(context, modelFilename);
-    optionsBuilder = ObjectDetectorOptions.builder().setMaxResults(NUM_DETECTIONS);
-    objectDetector = ObjectDetector.createFromBufferAndOptions(modelBuffer, optionsBuilder.build());
+  private TFLiteObjectDetectionAPIModel2(Context context, String modelFilename, boolean isCustomModel) throws IOException {
+    if(!isCustomModel){
+      modelBuffer = FileUtil.loadMappedFile(context, modelFilename);
+      optionsBuilder = ObjectDetectorOptions.builder().setMaxResults(NUM_DETECTIONS);
+      objectDetector = ObjectDetector.createFromBufferAndOptions(modelBuffer, optionsBuilder.build());
+    }
+    else{
+      // public static final DownloadType LOCAL_MODEL
+      // Use local model when present, otherwise download and return latest model
+      CustomModelDownloadConditions conditions = new CustomModelDownloadConditions.Builder()
+              .build();
+
+      FirebaseModelDownloader.getInstance()
+              .getModel(modelFilename, DownloadType.LOCAL_MODEL, conditions)
+              .addOnSuccessListener(new OnSuccessListener<CustomModel>() {
+                @Override
+                public void onSuccess(CustomModel customModel) {
+                  byte[] fileContent = new byte[0];
+                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    try {
+                      optionsBuilder = ObjectDetectorOptions.builder().setMaxResults(NUM_DETECTIONS);
+                      objectDetector = ObjectDetector.createFromFileAndOptions(customModel.getFile(), optionsBuilder.build());
+                    } catch (IOException e) {
+                      e.printStackTrace();
+                    }
+                  }
+                }
+              })
+              .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                  Log.i("asdasd", e.getMessage());
+                }
+              });
+    }
+
+
   }
 
   @Override
@@ -146,6 +199,14 @@ public class TFLiteObjectDetectionAPIModel2 implements Detector {
 
   private void recreateDetector() {
     objectDetector.close();
-    objectDetector = ObjectDetector.createFromBufferAndOptions(modelBuffer, optionsBuilder.build());
+    if(modelBuffer != null)
+      objectDetector = ObjectDetector.createFromBufferAndOptions(modelBuffer, optionsBuilder.build());
+    else {
+      try {
+        objectDetector = ObjectDetector.createFromFileAndOptions(customModelFile, optionsBuilder.build());
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
   }
 }

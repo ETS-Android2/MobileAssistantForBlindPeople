@@ -10,10 +10,12 @@ public class TrainYourselfDbObject implements Serializable {
 
     private String objectName;
     private List<String> storageLinksList;
+    private List<SelectedCoordinates> selectedCoordinatesList;
 
-    public TrainYourselfDbObject(String objectName, List<String> storageLinksList) {
+    public TrainYourselfDbObject(String objectName, List<String> storageLinksList, List<SelectedCoordinates> selectedCoordinatesList) {
         this.objectName = objectName;
         this.storageLinksList = storageLinksList;
+        this.selectedCoordinatesList = selectedCoordinatesList;
     }
 
     public String getObjectName() {
@@ -30,5 +32,13 @@ public class TrainYourselfDbObject implements Serializable {
 
     public void setStorageLinksList(List<String> storageLinksList) {
         this.storageLinksList = storageLinksList;
+    }
+
+    public List<SelectedCoordinates> getSelectedCoordinatesList() {
+        return selectedCoordinatesList;
+    }
+
+    public void setSelectedCoordinatesList(List<SelectedCoordinates> selectedCoordinatesList) {
+        this.selectedCoordinatesList = selectedCoordinatesList;
     }
 }
